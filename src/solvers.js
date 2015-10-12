@@ -34,7 +34,6 @@ window.findNRooksSolution = function(n) {
 
   if ( counter === n) {
     console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution));
-  //  solution.print();
     return solution.rows();
   } else {
     console.log("Didn't work");
@@ -44,7 +43,24 @@ window.findNRooksSolution = function(n) {
 
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
 window.countNRooksSolutions = function(n) {
-  var solution = undefined; //fixme
+  var solutionCount = 0;
+
+  var solutionFinder = function(n) {
+      
+    // Stop once the matrix is 1 x 1 --> which means you've found a valid solution
+    if (n === 1) {
+      solutionCount += 1;
+      return;
+    }
+
+    // Loop through all possible Rook positions in top row and run solution finder on smaller matrix composed of 'safe' slots below
+    // Note: All valid solutions for n-rooks will only have one rook on a given "top" row
+    for (var col = 0; col < n; col++) {  
+      solutionFinder(n - 1);
+    }
+  };
+
+  solutionFinder(n);
 
   console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
   return solutionCount;
