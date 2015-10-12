@@ -79,11 +79,27 @@
     //
     // test if a specific row on this board contains a conflict
     hasRowConflictAt: function(rowIndex) {
+      var counter = 0;
+      for ( var col = 0; col < this.get(rowIndex).length; col++){
+        if ( this.get(rowIndex)[col] ) {
+          counter++;
+        }
+      }
+      if ( counter > 1 ){
+        return true;
+      } 
+
       return false; // fixme
     },
 
     // test if any rows on this board contain conflicts
     hasAnyRowConflicts: function() {
+      // loop thru all rows
+      for (var row = 0; row < this.get('n'); row++) {
+        if ( this.hasRowConflictAt(row) ) {
+          return true;
+        }
+      }
       return false; // fixme
     },
 
@@ -94,11 +110,25 @@
     //
     // test if a specific column on this board contains a conflict
     hasColConflictAt: function(colIndex) {
+      var counter = 0;
+      for ( var row = 0; row < this.get('n'); row++) {
+        if ( this.get(row)[colIndex]) {
+          counter++;
+        }
+      }
+      if (counter > 1) {
+        return true;
+      }
       return false; // fixme
     },
 
     // test if any columns on this board contain conflicts
     hasAnyColConflicts: function() {
+      for ( var col = 0; col < this.get('n'); col++) {
+        if ( this.hasColConflictAt(col) ) {
+          return true;
+        }
+      }
       return false; // fixme
     },
 
@@ -130,6 +160,13 @@
     // test if any minor diagonals on this board contain conflicts
     hasAnyMinorDiagonalConflicts: function() {
       return false; // fixme
+    },
+
+    //
+    print: function(){
+      for (var row = 0; row < this.get('n'); row++){
+        console.log(this.get(row));
+      }
     }
 
     /*--------------------  End of Helper Functions  ---------------------*/
