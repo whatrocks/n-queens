@@ -71,47 +71,56 @@ window.findNQueensSolution = function(n) {
   var solution = new Board({n:n});
   var counter = 0;
 
+
+  var validSpot = function(board, row, col) {
+    return (!board.hasRowConflictAt(row) && !board.hasColConflictAt(col) && !board.hasMajorDiagonalConflictAt(col - row) && !board.hasMinorDiagonalConflictAt(col + row));
+  };
+
   // loop through each row
-  var checker = function(column) {
+  var checker = function(startRow, startColumn) {
 
     if ( n === 0 ){
       return;
     }
 
-    solution.togglePiece(0, column);
+    solution.togglePiece(startRow, startColumn);
     counter++;
+    if (counter === n) {
+      return;
+    }
+
+
+    // Collect the possible locations in the next row in array PossibleSpotsNextRow
+    // for ( var row = startRow + 1; row < n; row++) {
+    var possibleSpotsNextRow = [];
+    for ( var column = 0; column < n; column++) {
+      debugger;
+      solution.togglePiece(startRow + 1, column);
+      if ( validSpot(solution, startRow + 1, column) ) {
+        possibleSpotsNextRow.push(column);
+      }
+      solution.togglePiece(startRow + 1, column);
+    }
     
-    for ( var row = 1; row < n; row++) {
-      
-      if ( counter === n ) {
-        break;
-      }
+    if(possibleSpotsNextRow.length === 0) {
+      solution.togglePiece(startRow, startColumn);
+      counter--;
+      return;
+    }
+    // }
 
-      // debugger;
-      
-      for ( var col = 0; col < n; col++) {
-        debugger;
-        solution.togglePiece(row, col);        
-        if ( !solution.hasRowConflictAt(row) && !solution.hasColConflictAt(col) && !solution.hasMajorDiagonalConflictAt(col - row ) && !solution.hasMinorDiagonalConflictAt(col + row  ) ) {
-          counter++;
-          break;
-        } else {
-          solution.togglePiece(row, col);
-        }
-      } // end inner for loop
+    for (var candidate = 0; candidate < possibleSpotsNextRow.length; candidate++) {
+      checker(startRow + 1, possibleSpotsNextRow[candidate]);
+    }
+  };
 
-      if ( counter < (row + 1) ) {
-        counter = 0;
-        solution = new Board({n: n});
-        column += 1;
-        checker(column);
-      }
-
-    }// end outer for loop 
-  }; 
-
-  // TEMP TEST FOR n6
-  checker(3);
+  if ( counter < n) {
+    for(var firstRowCol = 0; firstRowCol < n; firstRowCol++) {
+      solution = new Board({n: n});
+      counter = 0;
+      checker(0, firstRowCol);
+    }
+  }
   
   if ( counter === n ) {
     return solution.rows();
@@ -129,3 +138,5 @@ window.countNQueensSolutions = function(n) {
   console.log('Number of solutions for ' + n + ' queens:', solutionCount);
   return solutionCount;
 };
+
+
