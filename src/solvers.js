@@ -156,7 +156,6 @@ window.countNQueensSolutions = function(n) {
   var solution = new Board({n:n});
   var solutionCount = 0;
 
-
   var validSpot = function(board, row, col) {
     return (!board.hasRowConflictAt(row) && !board.hasColConflictAt(col) && !board.hasMajorDiagonalConflictAt(col - row) && !board.hasMinorDiagonalConflictAt(col + row));
   };
@@ -168,52 +167,27 @@ window.countNQueensSolutions = function(n) {
       return;
     }
 
-    // turn it on for this round
-    solution.togglePiece(startRow, startColumn);
-
-    // Collect the possible locations in the next row in array PossibleSpotsNextRow
-    var possibleSpotsNextRow = [];
     for ( var column = 0; column < n; column++) {
-      solution.togglePiece(startRow + 1, column);
-      if ( validSpot(solution, startRow + 1, column) ) {
-        // if its the last row, then you've found a solution
-        if ( (startRow + 1) === (n - 1) ) {
+      solution.togglePiece(startRow, column);
+      if ( validSpot(solution, startRow, column) ) {
+        if ( (startRow) === (n - 1) ) {
           console.log("Next solution");
           solution.print();
           solutionCount++;
-          break;
-          // return;
         }
-        possibleSpotsNextRow.push(column);
-      }
-      solution.togglePiece(startRow + 1, column);
-    }
-    
-    // if nothing is possible, then turn off this piece
-    if ( possibleSpotsNextRow.length === 0 ) {
-      solution.togglePiece(startRow, startColumn);
-    }
 
-    console.log("possible spots are: " + possibleSpotsNextRow );
-    // now check the other pieces
-    for (var candidate = 0; candidate < possibleSpotsNextRow.length; candidate++) {
- //     if (validSpot(solution, startRow + 1, possibleSpotsNextRow[candidate])) {
-      if(candidate >= 1) {
-        if( solution.get(startRow+1)[possibleSpotsNextRow[candidate - 1]]) {
-          solution.togglePiece(startRow + 1, possibleSpotsNextRow[candidate - 1]);
-          console.log("i turned off the previous piece");
+        if ( startRow < (n-1)){
+          checker(startRow + 1, 0);
         }
       }
-      console.log("I'm now checking: " + possibleSpotsNextRow[candidate]);
-      checker(startRow + 1, possibleSpotsNextRow[candidate]);
-   //   }
+      solution.togglePiece(startRow, column);
     }
   };
 
   for(var firstRowCol = 0; firstRowCol < n; firstRowCol++) {
     solution = new Board({n: n});
-    console.log("I'm starting with column:" + firstRowCol);
-    checker(0, firstRowCol);
+    solution.togglePiece(0, firstRowCol);
+    checker(1, firstRowCol);
   }
 
   if ( n === 0 ) {
