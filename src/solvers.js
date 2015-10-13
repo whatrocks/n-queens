@@ -70,6 +70,7 @@ window.countNRooksSolutions = function(n) {
 window.findNQueensSolution = function(n) {
   var solution = new Board({n:n});
   var counter = 0;
+  var answer = solution.rows();
 
 
   var validSpot = function(board, row, col) {
@@ -79,7 +80,10 @@ window.findNQueensSolution = function(n) {
   // loop through each row
   var checker = function(startRow, startColumn) {
 
-    if ( n === 0 ){
+    if ( n === 1 ){
+      solution.togglePiece(startRow, startColumn);
+      answer = solution.rows();
+      counter++;
       return;
     }
 
@@ -94,9 +98,14 @@ window.findNQueensSolution = function(n) {
     // for ( var row = startRow + 1; row < n; row++) {
     var possibleSpotsNextRow = [];
     for ( var column = 0; column < n; column++) {
-      debugger;
+      // debugger;
       solution.togglePiece(startRow + 1, column);
       if ( validSpot(solution, startRow + 1, column) ) {
+        if ( startRow + 1 === n - 1) {
+          counter++;
+          answer = solution.rows();
+          return;
+        }
         possibleSpotsNextRow.push(column);
       }
       solution.togglePiece(startRow + 1, column);
@@ -123,18 +132,90 @@ window.findNQueensSolution = function(n) {
   }
   
   if ( counter === n ) {
-    return solution.rows();
-    console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
-  } else {
-    console.log("counter is: " + counter);
-    console.log("didn't work");
+    return answer;
+    console.log('Single solution for ' + n + ' queens:', JSON.stringify(answer));
+    } else {
+      console.log("counter is: " + counter);
+      console.log("didn't work");
   }
 };
 
 // return the number of nxn chessboards that exist, with n queens placed such that none of them can attack each other
 window.countNQueensSolutions = function(n) {
-  var solution = undefined; //fixme
+  var solution = new Board({n:n});
+  var counter = 0;
+  var solutionCount = 0;
 
+
+  var validSpot = function(board, row, col) {
+    return (!board.hasRowConflictAt(row) && !board.hasColConflictAt(col) && !board.hasMajorDiagonalConflictAt(col - row) && !board.hasMinorDiagonalConflictAt(col + row));
+  };
+
+  // loop through each row
+  var checker = function(startRow, startColumn) {
+
+    if ( n === 1){
+      solutionCount++;
+      return;
+    }
+
+    solution.togglePiece(startRow, startColumn);
+    counter++;
+
+    // Collect the possible locations in the next row in array PossibleSpotsNextRow
+    // for ( var row = startRow + 1; row < n; row++) {
+    var possibleSpotsNextRow = [];
+    for ( var column = 0; column < n; column++) {
+      // debugger;
+      solution.togglePiece(startRow + 1, column);
+      // if(!solution.hasRowConflictAt(startRow + 1)) {
+      //   solution.togglePiece(startRow + 1, column - 1);
+      // }
+      if ( validSpot(solution, startRow + 1, column) ) {
+        if ( (startRow + 1) === (n - 1) ) {
+          counter++;
+          console.log("Next solution");
+          solution.print();
+          solutionCount++;
+          return;
+        }
+        possibleSpotsNextRow.push(column);
+      }
+      solution.togglePiece(startRow + 1, column);
+    }
+    
+    if(possibleSpotsNextRow.length === 0) {
+      solution.togglePiece(startRow, startColumn);
+      counter--;
+      return;
+    }
+    // }
+
+    for (var candidate = 0; candidate < possibleSpotsNextRow.length; candidate++) {
+      checker(startRow + 1, possibleSpotsNextRow[candidate]);
+    }
+  };
+
+  // if ( counter < n ) {
+    for(var firstRowCol = 0; firstRowCol < n; firstRowCol++) {
+      solution = new Board({n: n});
+      counter = 0;
+      checker(0, firstRowCol);
+    }
+  // }
+
+  if ( n === 0 ) {
+    solutionCount++;
+  }
+
+  
+  // if ( counter === n ) {
+  //   return solution.rows();
+  //   console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
+  // } else {
+  //   console.log("counter is: " + counter);
+  //   console.log("didn't work");
+  // }
   console.log('Number of solutions for ' + n + ' queens:', solutionCount);
   return solutionCount;
 };
