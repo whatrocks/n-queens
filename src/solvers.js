@@ -70,7 +70,7 @@ window.countNRooksSolutions = function(n) {
 window.findNQueensSolution = function(n) {
   var solution = new Board({n:n});
   var counter = 0;
-  var answer = solution.rows();
+  var answer = solution.rows().slice();
 
 
   var validSpot = function(board, row, col) {
@@ -82,7 +82,7 @@ window.findNQueensSolution = function(n) {
 
     if ( n === 1 ){
       solution.togglePiece(startRow, startColumn);
-      answer = solution.rows();
+      answer = solution.rows().slice();
       counter++;
       return;
     }
@@ -103,7 +103,9 @@ window.findNQueensSolution = function(n) {
       if ( validSpot(solution, startRow + 1, column) ) {
         if ( startRow + 1 === n - 1) {
           counter++;
-          answer = solution.rows();
+          answer = solution.rows().slice();
+          console.log("counter: " + counter);
+          solution.print();
           return;
         }
         possibleSpotsNextRow.push(column);
@@ -119,12 +121,20 @@ window.findNQueensSolution = function(n) {
     // }
 
     for (var candidate = 0; candidate < possibleSpotsNextRow.length; candidate++) {
+      if(counter === 5) {
+        break;
+      }
       checker(startRow + 1, possibleSpotsNextRow[candidate]);
     }
   };
 
   if ( counter < n) {
+    //console.log("in here");
     for(var firstRowCol = 0; firstRowCol < n; firstRowCol++) {
+      console.log("in here");
+      if ( counter >= n) {
+        break;
+      }
       solution = new Board({n: n});
       counter = 0;
       checker(0, firstRowCol);
