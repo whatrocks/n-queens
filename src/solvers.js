@@ -71,6 +71,7 @@ window.findNQueensSolution = function(n) {
   var solution = new Board({n:n});
   var counter = 0;
   var answer = solution.rows().slice();
+  console.log("I'm looking for n of :" + n);
 
 
   var validSpot = function(board, row, col) {
@@ -87,12 +88,12 @@ window.findNQueensSolution = function(n) {
       return;
     }
 
-    solution.togglePiece(startRow, startColumn);
-    counter++;
     if (counter === n) {
       return;
     }
 
+    solution.togglePiece(startRow, startColumn);
+    counter++;
 
     // Collect the possible locations in the next row in array PossibleSpotsNextRow
     // for ( var row = startRow + 1; row < n; row++) {
@@ -106,33 +107,33 @@ window.findNQueensSolution = function(n) {
           answer = solution.rows().slice();
           console.log("counter: " + counter);
           solution.print();
-          return;
+          break;
         }
         possibleSpotsNextRow.push(column);
       }
       solution.togglePiece(startRow + 1, column);
     }
     
-    if(possibleSpotsNextRow.length === 0) {
+    if( possibleSpotsNextRow.length === 0 && counter !== n) {
       solution.togglePiece(startRow, startColumn);
       counter--;
-      return;
     }
-    // }
 
     for (var candidate = 0; candidate < possibleSpotsNextRow.length; candidate++) {
-      if(counter === 5) {
+      if(counter === n) {
         break;
+      } 
+      if (validSpot(solution, startRow + 1, possibleSpotsNextRow[candidate])) {
+        checker(startRow + 1, possibleSpotsNextRow[candidate]);
       }
-      checker(startRow + 1, possibleSpotsNextRow[candidate]);
     }
   };
 
   if ( counter < n) {
-    //console.log("in here");
     for(var firstRowCol = 0; firstRowCol < n; firstRowCol++) {
       console.log("in here");
       if ( counter >= n) {
+        console.log("break because match!");
         break;
       }
       solution = new Board({n: n});
@@ -153,7 +154,6 @@ window.findNQueensSolution = function(n) {
 // return the number of nxn chessboards that exist, with n queens placed such that none of them can attack each other
 window.countNQueensSolutions = function(n) {
   var solution = new Board({n:n});
-  var counter = 0;
   var solutionCount = 0;
 
 
@@ -161,7 +161,6 @@ window.countNQueensSolutions = function(n) {
     return (!board.hasRowConflictAt(row) && !board.hasColConflictAt(col) && !board.hasMajorDiagonalConflictAt(col - row) && !board.hasMinorDiagonalConflictAt(col + row));
   };
 
-  // loop through each row
   var checker = function(startRow, startColumn) {
 
     if ( n === 1){
@@ -169,63 +168,58 @@ window.countNQueensSolutions = function(n) {
       return;
     }
 
+    // turn it on for this round
     solution.togglePiece(startRow, startColumn);
-    counter++;
 
     // Collect the possible locations in the next row in array PossibleSpotsNextRow
-    // for ( var row = startRow + 1; row < n; row++) {
     var possibleSpotsNextRow = [];
     for ( var column = 0; column < n; column++) {
-      // debugger;
       solution.togglePiece(startRow + 1, column);
-      // if(!solution.hasRowConflictAt(startRow + 1)) {
-      //   solution.togglePiece(startRow + 1, column - 1);
-      // }
       if ( validSpot(solution, startRow + 1, column) ) {
+        // if its the last row, then you've found a solution
         if ( (startRow + 1) === (n - 1) ) {
-          counter++;
           console.log("Next solution");
           solution.print();
           solutionCount++;
-          return;
+          break;
+          // return;
         }
         possibleSpotsNextRow.push(column);
       }
       solution.togglePiece(startRow + 1, column);
     }
     
-    if(possibleSpotsNextRow.length === 0) {
+    // if nothing is possible, then turn off this piece
+    if ( possibleSpotsNextRow.length === 0 ) {
       solution.togglePiece(startRow, startColumn);
-      counter--;
-      return;
     }
-    // }
 
+    console.log("possible spots are: " + possibleSpotsNextRow );
+    // now check the other pieces
     for (var candidate = 0; candidate < possibleSpotsNextRow.length; candidate++) {
+ //     if (validSpot(solution, startRow + 1, possibleSpotsNextRow[candidate])) {
+      if(candidate >= 1) {
+        if( solution.get(startRow+1)[possibleSpotsNextRow[candidate - 1]]) {
+          solution.togglePiece(startRow + 1, possibleSpotsNextRow[candidate - 1]);
+          console.log("i turned off the previous piece");
+        }
+      }
+      console.log("I'm now checking: " + possibleSpotsNextRow[candidate]);
       checker(startRow + 1, possibleSpotsNextRow[candidate]);
+   //   }
     }
   };
 
-  // if ( counter < n ) {
-    for(var firstRowCol = 0; firstRowCol < n; firstRowCol++) {
-      solution = new Board({n: n});
-      counter = 0;
-      checker(0, firstRowCol);
-    }
-  // }
+  for(var firstRowCol = 0; firstRowCol < n; firstRowCol++) {
+    solution = new Board({n: n});
+    console.log("I'm starting with column:" + firstRowCol);
+    checker(0, firstRowCol);
+  }
 
   if ( n === 0 ) {
     solutionCount++;
   }
 
-  
-  // if ( counter === n ) {
-  //   return solution.rows();
-  //   console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
-  // } else {
-  //   console.log("counter is: " + counter);
-  //   console.log("didn't work");
-  // }
   console.log('Number of solutions for ' + n + ' queens:', solutionCount);
   return solutionCount;
 };
