@@ -159,11 +159,16 @@ window.countNQueensSolutions = function(n) {
       solution.togglePiece(startRow, column);
       if ( validSpot(solution, startRow, column) ) {
         if ( (startRow) === (n - 1) ) {
-          // console.log("Next solution");
-          // solution.print();
-          solutionCount++;
+          var middle;
+          if(n%2 === 1) {
+            middle = Math.floor(n/2);  
+          }
+          if( solution.get(0)[middle] === 1 ) {
+            solutionCount++;
+          } else {
+          solutionCount+=2;
+          }
         }
-
         if ( startRow < (n-1)){
           checker(startRow + 1, 0);
         }
@@ -172,7 +177,7 @@ window.countNQueensSolutions = function(n) {
     }
   };
 
-  for(var firstRowCol = 0; firstRowCol < n; firstRowCol++) {
+  for(var firstRowCol = 0; firstRowCol < (n/2); firstRowCol++) {
     solution = new Board({n: n});
     solution.togglePiece(0, firstRowCol);
     checker(1, firstRowCol);
